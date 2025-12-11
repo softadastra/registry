@@ -8,6 +8,17 @@ and this project adheres to **Semantic Versioning (SemVer)**.
 ---
 
 ## [Unreleased]
+## [0.0.1] - 2025-12-11
+
+### Added
+- 
+
+### Changed
+- 
+
+### Removed
+- 
+
 
 ### Added
 
