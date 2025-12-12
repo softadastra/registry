@@ -86,6 +86,7 @@ packages/
 *.local
 *.env.*
 cmd.md
+future.md
 
 # ---------------------------------------------------------
 # IDE / Editor config

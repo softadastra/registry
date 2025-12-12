@@ -1,14 +1,7 @@
-#include <vix.hpp>
-using namespace vix;
+#include <softadastra/registry/App.hpp>
 
 int main()
 {
-    App app;
-
-    // GET /
-    app.get("/", [](auto&, auto& res) {
-        res.json({"message", "Hello world"});
-    });
-
-    app.run(8080);
+    softadastra::registry::App app;
+    return app.run();
 }
