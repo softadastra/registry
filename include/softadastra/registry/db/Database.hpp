@@ -41,9 +41,9 @@ namespace softadastra::registry::db
         Transaction makeTransaction();
         void testConnection();
         static DatabaseConfig loadFromEnv(const std::string &prefix = "REGISTRY_DB_");
-        static Database fromEnv(const std::string &prefix = "REGISTRY_DB_")
+        static std::shared_ptr<Database> fromEnvShared(const std::string &prefix = "REGISTRY_DB_")
         {
-            return Database(loadFromEnv(prefix));
+            return std::make_shared<Database>(loadFromEnv(prefix));
         }
     };
 

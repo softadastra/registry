@@ -19,12 +19,13 @@ namespace softadastra::registry
 
     private:
         static const char *resolveConfigPath();
-        static db::Database initDatabase(const vix::config::Config &cfg);
+        static std::shared_ptr<db::Database> initDatabase(const vix::config::Config &cfg);
 
     private:
         vix::config::Config config_;
         std::uint16_t port_{8080};
-        db::Database db_;
+
+        std::shared_ptr<db::Database> db_;
         std::unique_ptr<http::HttpServer> server_;
     };
-} // namespace softadastra::registry
+}
