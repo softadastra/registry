@@ -22,10 +22,9 @@ namespace softadastra::registry
         return "config/config.dev.json";
     }
 
-    static DatabaseConfig makeDbConfigFromFileConfig(const vix::config::Config &cfg)
+    static db::DatabaseConfig makeDbConfigFromFileConfig(const vix::config::Config &cfg)
     {
-        DatabaseConfig dbCfg{};
-
+        db::DatabaseConfig dbCfg{};
         const std::string host = cfg.getString("database.default.HOST", "localhost");
         const int port = cfg.getInt("database.default.PORT", 3306);
         const std::string user = cfg.getString("database.default.USER", "root");
@@ -36,34 +35,30 @@ namespace softadastra::registry
         dbCfg.user = user;
         dbCfg.password = pass;
         dbCfg.database = name;
-
         dbCfg.poolMin = 1;
         dbCfg.poolMax = 8;
-
         return dbCfg;
     }
 
-    Database App::initDatabase(const vix::config::Config &cfg)
+    std::shared_ptr<db::Database> App::initDatabase(const vix::config::Config &cfg)
     {
         if (const char *envHost = std::getenv("REGISTRY_DB_HOST"))
         {
-            if (envHost && *envHost != '\0')
-            {
-                return Database::fromEnv("REGISTRY_DB_");
-            }
+            if (*envHost != '\0')
+                return db::Database::fromEnvShared("REGISTRY_DB_");
         }
 
         auto dbCfg = makeDbConfigFromFileConfig(cfg);
-        return Database{dbCfg};
+        return std::make_shared<db::Database>(dbCfg);
     }
 
     App::App()
-        : config_(resolveConfigPath()), db_(initDatabase(config_))
+        : config_(resolveConfigPath())
     {
-        port_ = static_cast<std::uint16_t>(
-            config_.getInt("http.port", config_.getServerPort()));
+        port_ = static_cast<std::uint16_t>(config_.getInt("http.port", config_.getServerPort()));
 
-        server_ = std::make_unique<http::HttpServer>(port_);
+        db_ = initDatabase(config_);
+        server_ = std::make_unique<http::HttpServer>(port_, db_);
     }
 
     App::~App() = default;
@@ -75,7 +70,7 @@ namespace softadastra::registry
 
         try
         {
-            db_.testConnection();
+            db_->testConnection();
             std::cout << "[registry] Database connection OK." << std::endl;
         }
         catch (const std::exception &e)
